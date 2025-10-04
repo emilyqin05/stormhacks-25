@@ -5,28 +5,36 @@ from google import genai
 import logging
 from dotenv import load_dotenv
 
-load_dotenv() 
+load_dotenv()
 
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-print(os.getenv("SLACK_BOT_TOKEN"))
+
 app = App(token=os.getenv("SLACK_BOT_TOKEN"))
 
 SYSTEM_PROMPT = "You are a helpful assistant that answers Slack messages clearly and concisely."
 
+chat_history = {}
 
 @app.message("")
 def handle_message(message, say):
+    channel_id = message['channel']
     user_text = message['text']
     
-    conversation = [
-        {"role": "system", "content": SYSTEM_PROMPT},
-        {"role": "user", "content": user_text}
-    ]
-
+    if channel_id not in chat_history:
+        chat_history[channel_id] = [{"role": "system", "content": SYSTEM_PROMPT}]
+    
+    chat_history[channel_id].append({"role": "user", "content": user_text})
+    
+    conversation_text = "\n".join(
+        f"{msg['role'].capitalize()}: {msg['content']}" for msg in chat_history[channel_id]
+    )
+    
     response = client.models.generate_content(
         model="gemini-2.5-flash",
-        contents=user_text
+        contents=conversation_text
     )
+    
+    chat_history[channel_id].append({"role": "assistant", "content": response.text})
     
     say(response.text)
 
