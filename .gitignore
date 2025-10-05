@@ -7,3 +7,4 @@ email-server/tokens.json
 slack-server/credentials.json
 slack-server/credentials.json
 /email-server/.idea
+slack-server/token.json
