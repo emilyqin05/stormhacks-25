@@ -5,8 +5,12 @@
 slack-server/tokens.json
 email-server/tokens.json
 slack-server/credentials.json
-slack-server/credentials.json
 /email-server/.idea
 .vercel
-slack-server/token.json
 /slack-server/__pycache__
+
+.DS_Store
+slack-server/.DS_Store
+slack-server/gcal-integration/.DS_Store
+slack-server/gcal-integration/__pycache__/
+token.pickle
