@@ -1,0 +1,147 @@
+html_template = '''
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Schedule Your Interview</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background-color: #f5f5f5;
+      padding: 40px 20px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      border-radius: 8px;
+      padding: 48px 40px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 12px;
+    }
+
+    .header p {
+      font-size: 16px;
+      color: #666666;
+    }
+
+    .time-slots {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .time-slot-button {
+      display: block;
+      width: 100%;
+      padding: 20px 24px;
+      background-color: #ffffff;
+      border: 2px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 500;
+      color: #1a1a1a;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .time-slot-button:hover {
+      border-color: #1a1a1a;
+      background-color: #fafafa;
+    }
+
+    .time-slot-button:active {
+      background-color: #f0f0f0;
+    }
+
+    .time-slot-button .time {
+      display: block;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .time-slot-button .date {
+      display: block;
+      font-size: 14px;
+      color: #666666;
+    }
+
+    .footer {
+      text-align: center;
+      padding-top: 24px;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    .footer p {
+      font-size: 14px;
+      color: #999999;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 32px 24px;
+      }
+
+      .header h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Schedule Your Interview</h1>
+      <p>Please select a time slot that works best for you</p>
+    </div>
+
+    <div class="time-slots">
+      <a href="link1" class="time-slot-button">
+        <span class="time">10:00 AM - 11:00 AM</span>
+        <span class="date">Monday, January 15, 2025</span>
+      </a>
+
+      <a href="link2" class="time-slot-button">
+        <span class="time">2:00 PM - 3:00 PM</span>
+        <span class="date">Tuesday, January 16, 2025</span>
+      </a>
+
+      <a href="link3" class="time-slot-button">
+        <span class="time">4:00 PM - 5:00 PM</span>
+        <span class="date">Wednesday, January 17, 2025</span>
+      </a>
+    </div>
+
+    <div class="footer">
+      <p>If none of these times work, please reply to this email</p>
+    </div>
+  </div>
+  
+</body>
+</html>
+
+'''

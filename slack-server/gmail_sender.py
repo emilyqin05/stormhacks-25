@@ -1,5 +1,4 @@
 import base64
-from email.message import EmailMessage
 from email.mime.text import MIMEText
 import os.path
 
@@ -8,11 +7,36 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+from interviewscheduling import html_template
 
 SCOPES = ["https://www.googleapis.com/auth/gmail.send"]
 
 
-def send_schedule_interview_email(message_content: str, applicant_email: str, applicant_name: str):
+def send_schedule_interview_email(
+    candidate_email: str,
+    candidate_name: str,
+
+    interviewer1_slack_id: str,
+    interviewer1_names: str,
+    interviewer1_emails: str,
+    interviewer1_start_times: str,
+    interviewer1_end_times: str,
+    interviewer1_zoom_link: str,
+
+    interviewer2_slack_id: str,
+    interviewer2_names: str,
+    interviewer2_emails: str,
+    interviewer2_start_times: str,
+    interviewer2_end_times: str,
+    interviewer2_zoom_link: str,
+
+    interviewer3_slack_id: str,
+    interviewer3_names: str,
+    interviewer3_emails: str,
+    interviewer3_start_times: str,
+    interviewer3_end_times: str,
+    interviewer3_zoom_link: str,
+):
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -35,26 +59,54 @@ def send_schedule_interview_email(message_content: str, applicant_email: str, ap
     try:
         service = build("gmail", "v1", credentials=creds)
 
-        template_path = os.path.join(os.path.dirname(__file__), "interview-scheduling.html")
-        with open(template_path, "r", encoding="utf-8") as template_file:
-            html_content = template_file.read()
-        message = MIMEText(html_content, 'html')
-        # message.set_content(message_content)
-        # message = EmailMessage()
+        link1 = getButtonLink(
+            candidate_email,
+            candidate_name,
+            interviewer1_slack_id,
+            interviewer1_names,
+            interviewer1_emails,
+            interviewer1_start_times,
+            interviewer1_end_times,
+            interviewer1_zoom_link,
+        )
+        link2 = getButtonLink(
+            candidate_email,
+            candidate_name,
+            interviewer2_slack_id,
+            interviewer2_names,
+            interviewer2_emails,
+            interviewer2_start_times,
+            interviewer2_end_times,
+            interviewer2_zoom_link,
+        )
+        link3 = getButtonLink(
+            candidate_email,
+            candidate_name,
+            interviewer3_slack_id,
+            interviewer3_names,
+            interviewer3_emails,
+            interviewer3_start_times,
+            interviewer3_end_times,
+            interviewer3_zoom_link,
+        )
 
-        # TODO: make template for message content
-
-        # TODO: have scheduling link in message content
-        message["To"] = applicant_email
+        # Inject generated links into the interview scheduling HTML template
+        html = (
+            html_template
+            .replace("link1", link1)
+            .replace("link2", link2)
+            .replace("link3", link3)
+        )
+        message = MIMEText(html, 'text/html')
+        message["To"] = candidate_email
         message["From"] = "candidateagent9@gmail.com"
 
-        subject = f"Congrats {applicant_name}! You've been scheduled for an interview."
+        subject = f"Congrats {candidate_name}! You've been scheduled for an interview."
         message["Subject"] = subject
 
         encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
 
         create_message = {"raw": encoded_message}
-
 
         send_message = (
             service.users()
@@ -67,6 +119,31 @@ def send_schedule_interview_email(message_content: str, applicant_email: str, ap
         print(f"An error occurred: {error}")
         send_message = None
     return send_message
+
+
+def getButtonLink(
+    candidate_email: str,
+    candidate_name: str,
+    interviewer_slack_id: str,
+    interviewer_names: str,
+    interviewer_emails: str,
+    interviewer_start_times: str,
+    interviewer_end_times: str,
+    interviewer_zoom_link: str,
+):
+    base_url = "http://127.0.0.1:5001/book-interview"
+    return (
+        f"{base_url}?"
+        f"candidate_email={candidate_email}&"
+        f"candidate_name={candidate_name}&"
+        f"interviewer_slack_id={interviewer_slack_id}&"
+        f"interviewer_names={interviewer_names}&"
+        f"interviewer_emails={interviewer_emails}&"
+        f"interviewer_start_times={interviewer_start_times}&"
+        f"interviewer_end_times={interviewer_end_times}&"
+        f"interviewer_zoom_link={interviewer_zoom_link}"
+    )
+
 
 def main():
     # Example invocation for manual testing
@@ -82,24 +159,58 @@ if __name__ == "__main__":
 
 send_schedule_interview_email_declaration = {
     "name": "send_schedule_interview_email",
-    "description": "Sends email to schedule an interview. Use this when you want to schedule an interview with shortlisted candidiates.",
+    "description": "Send interview scheduling email with three interviewer detail groups.",
     "parameters": {
         "type": "object",
         "properties": {
-            "message_content": {
-                "type": "string",
-                "description": "Plain text body of the email to send to the candidate.",
-            },
-            "applicant_email": {
-                "type": "string",
-                "format": "email",
-                "description": "Candidate's email address.",
-            },
-            "applicant_name": {
-                "type": "string",
-                "description": "Candidate's full name used in the email subject/body.",
-            },
+            "candidate_email": {"type": "string", "format": "email"},
+            "candidate_name": {"type": "string"},
+
+            "interviewer1_slack_id": {"type": "string"},
+            "interviewer1_names": {"type": "string"},
+            "interviewer1_emails": {"type": "string", "format": "email"},
+            "interviewer1_start_times": {"type": "string"},
+            "interviewer1_end_times": {"type": "string"},
+            "interviewer1_zoom_link": {"type": "string"},
+
+            "interviewer2_slack_id": {"type": "string"},
+            "interviewer2_names": {"type": "string"},
+            "interviewer2_emails": {"type": "string", "format": "email"},
+            "interviewer2_start_times": {"type": "string"},
+            "interviewer2_end_times": {"type": "string"},
+            "interviewer2_zoom_link": {"type": "string"},
+
+            "interviewer3_slack_id": {"type": "string"},
+            "interviewer3_names": {"type": "string"},
+            "interviewer3_emails": {"type": "string", "format": "email"},
+            "interviewer3_start_times": {"type": "string"},
+            "interviewer3_end_times": {"type": "string"},
+            "interviewer3_zoom_link": {"type": "string"},
         },
-        "required": ["message_content", "applicant_email", "applicant_name"],
+        "required": [
+            "candidate_email",
+            "candidate_name",
+
+            "interviewer1_slack_id",
+            "interviewer1_names",
+            "interviewer1_emails",
+            "interviewer1_start_times",
+            "interviewer1_end_times",
+            "interviewer1_zoom_link",
+
+            "interviewer2_slack_id",
+            "interviewer2_names",
+            "interviewer2_emails",
+            "interviewer2_start_times",
+            "interviewer2_end_times",
+            "interviewer2_zoom_link",
+
+            "interviewer3_slack_id",
+            "interviewer3_names",
+            "interviewer3_emails",
+            "interviewer3_start_times",
+            "interviewer3_end_times",
+            "interviewer3_zoom_link",
+        ],
     },
 }

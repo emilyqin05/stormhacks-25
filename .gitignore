@@ -14,3 +14,7 @@ slack-server/.DS_Store
 slack-server/gcal-integration/.DS_Store
 slack-server/gcal-integration/__pycache__/
 token.pickle
+slack-server/service-account-key.json
+slack-server/token.json
+slack-server/token.json
+slack-server/token.json

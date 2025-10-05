@@ -10,6 +10,7 @@ import random
 from slack_sdk import WebClient
 import requests
 from io import BytesIO
+from google.genai import types
 
 
 load_dotenv()
@@ -43,7 +44,7 @@ def handle_message(message, say):
     )
 
 
-    interviewTool = types.Tool(function_declarations=[send_schedule_interview_schedule_interview_email_declaration])
+    interviewTool = types.Tool(function_declarations=[send_schedule_interview_email_declaration])
     resumeTool = types.Tool(function_declarations=[get_resume_declaration])
 
     config = types.GenerateContentConfig(tools=[interviewTool, resumeTool])
@@ -78,10 +79,6 @@ def handle_message(message, say):
     ]).execute()
     say(response.text)
 
-
-
-from google.genai import types
-
 get_resume_declaration = types.FunctionDeclaration(
     name="showResume",
     description="Fetches a list of candidate resumes from the directory table. Returns the top N resumes randomly selected.",
@@ -96,6 +93,8 @@ get_resume_declaration = types.FunctionDeclaration(
         required=[]
     )
 )
+
+
 def getResume():
     #Magic ats
     response = supabase.table("applicants").select("*").execute()
@@ -104,43 +103,66 @@ def getResume():
     random_rows = random.sample(rows, 2)
     return random_rows
 
+
 def sendInterview(email, name):
     ints = [{'id': 'int_001', 'name': 'Emily Qin', 'email': '123emilyqin@gmail.com', 'slack_id': 'U1234ABCD', 'slack_email': 'alice@company.com', 'zoom_link': 'https://zoom.us/j/alice-personal-room', 'role': 'Senior Engineer', 'start_time': '2025-10-06T09:00:00', 'end_time': '2025-10-06T10:00:00'},{'id': 'int_002','name': 'Agent','email': 'candidateagent9@gmail.com','slack_id': 'U5678EFGH','slack_email': 'bob@company.com','zoom_link': 'https://zoom.us/j/bob-personal-room','role': 'Tech Lead','start_time': '2025-10-06T09:00:00','end_time': '2025-10-06T10:00:00'}
     ,{'id': 'int_003','name': 'Agent','email': 'notrealcandidate@gmail.com','slack_id': 'U5678EFGH','slack_email': 'weafbob@company.com','zoom_link': 'https://zoom.us/j/bob-personal-room','role': 'Tech Lead','start_time': '2025-10-08T09:00:00','end_time': '2025-10-08T10:00:00'}]
+    send_schedule_interview_email(
+        candidate_email=email,
+        candidate_name=name,
+
+        interviewer1_slack_id=ints[0]['slack_id'],
+        interviewer1_names=ints[0]['name'],
+        interviewer1_emails=ints[0]['email'],
+        interviewer1_start_times=ints[0]['start_time'],
+        interviewer1_end_times=ints[0]['end_time'],
+        interviewer1_zoom_links=ints[0]['zoom_link'],
+
+        interviewer2_slack_id=ints[1]['slack_id'],
+        interviewer2_names=ints[1]['name'],
+        interviewer2_emails=ints[1]['email'],
+        interviewer2_start_times=ints[1]['start_time'],
+        interviewer2_end_times=ints[1]['end_time'],
+        interviewer2_zoom_links=ints[1]['zoom_link'],
+
+        interviewer3_slack_id=ints[2]['slack_id'],
+        interviewer3_names=ints[2]['name'],
+        interviewer3_emails=ints[2]['email'],
+        interviewer3_start_times=ints[2]['start_time'],
+        interviewer3_end_times=ints[2]['end_time'],
+        interviewer3_zoom_links=ints[2]['zoom_link'],
+    )
     
-    send_schedule_interview_email("You got the job", "jjforce17@gmail.com", "Fabian")
-    
 
+@app.command("/getresumes")
+def showResume(ack, say, command):
+    ack()
+    app.logger.info("error  called")
+    try:
+        resumes = getResume()
+        for resume in resumes:
+            pdf_url = resume.get("resume_url")  # adjust to your column name in Supabase
+            name = resume.get("name", "Candidate")
+            email = resume.get("email", "no email avail")
 
-    @app.command("/getresumes")
-    def showResume(ack, say, command):
-        ack()
-        app.logger.info("error  called")
-        try:
-            resumes = getResume()
-            for resume in resumes:
-                pdf_url = resume.get("resume_url")  # adjust to your column name in Supabase
-                name = resume.get("name", "Candidate")
-                email = resume.get("email", "no email avail")
-
-                if pdf_url:
-                    # Download PDF into memory
-                    response = requests.get(pdf_url)
-                    if response.status_code == 200:
-                        file_bytes = BytesIO(response.content)
-                        slack_client.files_upload_v2(
-                        channel=command["channel_id"],
-                        file=file_bytes,
-                        filename=f"{name}.pdf",
-                        title=f"{name}'s Resume",
-                        initial_comment=f"Here is {name}'s resume. And their email is {email}"
-                    )
-                    else:
-                        say(f"Could not download {name}'s resume.")
+            if pdf_url:
+                # Download PDF into memory
+                response = requests.get(pdf_url)
+                if response.status_code == 200:
+                    file_bytes = BytesIO(response.content)
+                    slack_client.files_upload_v2(
+                    channel=command["channel_id"],
+                    file=file_bytes,
+                    filename=f"{name}.pdf",
+                    title=f"{name}'s Resume",
+                    initial_comment=f"Here is {name}'s resume. And their email is {email}"
+                )
                 else:
-                    say(f"{name} does not have a resume uploaded.")
-        except Exception as e:
-            print("error", e)
+                    say(f"Could not download {name}'s resume.")
+            else:
+                say(f"{name} does not have a resume uploaded.")
+    except Exception as e:
+        print("error", e)
 
 if __name__ == "__main__":
     SocketModeHandler(app, os.getenv("SLACK_APP_TOKEN")).start()
