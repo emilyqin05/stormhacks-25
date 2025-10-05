@@ -11,7 +11,6 @@ from interviewscheduling import html_template
 
 SCOPES = ["https://www.googleapis.com/auth/gmail.send"]
 
-
 def send_schedule_interview_email(
     candidate_email: str,
     candidate_name: str,
@@ -115,6 +114,7 @@ def send_schedule_interview_email(
             .execute()
         )
 
+
     except HttpError as error:
         print(f"An error occurred: {error}")
         send_message = None
@@ -147,7 +147,7 @@ def getButtonLink(
 
 def main():
     # Example invocation for manual testing
-    send_schedule_interview_email(
+    send_email(
         "Hello, this is a test email.",
         "test@test.com",
         "Test User",
