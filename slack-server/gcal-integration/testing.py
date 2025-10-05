@@ -6,6 +6,7 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from typing import List, Dict
+import pytz
 
 # Scopes - what permissions we need
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
@@ -25,7 +26,7 @@ def authenticate():
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
+                '../../email-server/credentials.json', SCOPES)
             creds = flow.run_local_server(port=0)
         
         # Save the credentials for the next run
@@ -122,12 +123,18 @@ def find_common_free_slots(freebusy_result, duration_minutes: int = 60, max_slot
 def is_slot_free_for_all(calendars: Dict, slot_start: datetime, slot_end: datetime) -> bool:
     """Check if a time slot is free for all people"""
     
+    local_tz = pytz.timezone("America/Vancouver")
+
     for email, cal_data in calendars.items():
         busy_times = cal_data.get('busy', [])
         
         for busy in busy_times:
+
             busy_start = datetime.fromisoformat(busy['start'].replace('Z', '+00:00'))
+            busy_start = busy_start.astimezone(local_tz) 
+
             busy_end = datetime.fromisoformat(busy['end'].replace('Z', '+00:00'))
+            busy_end = busy_end.astimezone(local_tz) 
             
             # Make timezone-naive for comparison
             busy_start = busy_start.replace(tzinfo=None)
