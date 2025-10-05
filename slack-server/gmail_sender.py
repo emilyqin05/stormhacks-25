@@ -1,7 +1,7 @@
 import base64
+from email.message import EmailMessage
 import os.path
 
-from email.mime.text import MIMEText
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -11,7 +11,7 @@ from googleapiclient.errors import HttpError
 SCOPES = ["https://www.googleapis.com/auth/gmail.send"]
 
 
-def send_schedule_interview_email(sender, reply_subject, reply_body, thread_id, message_id_header):
+def send_schedule_interview_email(message_content, applicant_email, applicant_name):
     """
     Sends an email reply using the Gmail API.
 
@@ -44,53 +44,30 @@ def send_schedule_interview_email(sender, reply_subject, reply_body, thread_id, 
     try:
         # Call the Gmail API to send the email
         service = build("gmail", "v1", credentials=creds)
+        message = EmailMessage()
 
-        reply_msg = create_reply_message(
-            to=sender,
-            subject=reply_subject,
-            message_text=reply_body,
-            thread_id=thread_id,
-            message_id=message_id_header
+        message.set_content(message_content)
+        message["To"] = applicant_email
+        message["From"] = "candidateagent9@gmail.com"
+
+        subject = f"Congrats {applicant_name}! You've been scheduled for an interview."
+        message["Subject"] = subject
+
+        encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
+
+        create_message = {"raw": encoded_message}
+
+        send_message = (
+            service.users()
+            .messages()
+            .send(userId="me", body=create_message)
+            .execute()
         )
-
-        result = service.users().messages().send(userId="me", body=reply_msg).execute()
-        print(f"Email sent successfully! Message ID: {result.get('id')}")
-        return result
 
     except HttpError as error:
         print(f"An error occurred: {error}")
-        raise
-
-
-def create_reply_message(to, subject, message_text, thread_id=None, message_id=None):
-    """
-    Create a message for an email reply.
-
-    Args:
-      to: Email address of the receiver.
-      subject: The subject of the email message.
-      message_text: The text of the email message.
-      thread_id: The thread ID to reply to.
-      message_id: The message ID to reply to (for In-Reply-To header).
-
-    Returns:
-      An object containing a base64url encoded email object.
-    """
-    message = MIMEText(message_text)
-    message['to'] = to
-    message['subject'] = subject
-
-    if message_id:
-        message['In-Reply-To'] = message_id
-        message['References'] = message_id
-
-    raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
-
-    body = {'raw': raw_message}
-    if thread_id:
-        body['threadId'] = thread_id
-
-    return body
+        send_message = None
+    return send_message
 
 
 send_email_declaration = {
@@ -104,4 +81,4 @@ send_email_declaration = {
 }
 
 if __name__ == "__main__":
-    send_schedule_interview_email("", "Interview Schedule", "Hello, this is a test email.", "1234567890", "1234567890")
+    send_schedule_interview_email("Hello, this is a test email.", "test@test.com", "Test User")
