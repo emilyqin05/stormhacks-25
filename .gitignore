@@ -8,4 +8,4 @@ slack-server/credentials.json
 slack-server/credentials.json
 /email-server/.idea
 .vercel
-*/.DS_Store
+.DS_Store
