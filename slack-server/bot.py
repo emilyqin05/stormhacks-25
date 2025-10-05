@@ -5,7 +5,7 @@ from google import genai
 from google.genai import types
 from dotenv import load_dotenv
 from supabase import create_client
-from gmail_sender import send_candidate_email_declaration, send_email
+from gmail_sender import send_schedule_interview_email
 import random
 from slack_sdk import WebClient
 import requests
@@ -30,15 +30,70 @@ chat_history = [
 ]
 
 print("got chat")
-def sendInterview(message_content: str, applicant_email: str, applicant_name: str):
-    print("HOLA")
-    ints = [
-        {'id': 'int_001', 'name': 'Emily Qin', 'email': '123emilyqin@gmail.com', 'slack_id': 'U1234ABCD', 'slack_email': 'alice@company.com', 'zoom_link': 'https://zoom.us/j/alice-personal-room', 'role': 'Senior Engineer', 'start_time': '2025-10-06T09:00:00', 'end_time': '2025-10-06T10:00:00'},
-        {'id': 'int_002','name': 'Agent','email': 'candidateagent9@gmail.com','slack_id': 'U5678EFGH','slack_email': 'bob@company.com','zoom_link': 'https://zoom.us/j/bob-personal-room','role': 'Tech Lead','start_time': '2025-10-06T09:00:00','end_time': '2025-10-06T10:00:00'},
-        {'id': 'int_003','name': 'Agent','email': 'notrealcandidate@gmail.com','slack_id': 'U5678EFGH','slack_email': 'weafbob@company.com','zoom_link': 'https://zoom.us/j/bob-personal-room','role': 'Tech Lead','start_time': '2025-10-08T09:00:00','end_time': '2025-10-08T10:00:00'}
-    ]
+def sendInterview(applicant_email: str, applicant_name: str):
+    print("EMAILLLLLL", applicant_email)
+    interviewers = [
+    {
+        'id': 'int_001',
+        'name': 'Emily Qin',
+        'email': '123emilyqin@gmail.com',
+        'slack_id': 'U1234ABCD',
+        'slack_email': 'emily@company.com',
+        'zoom_link': 'https://zoom.us/j/emily-personal-room',
+        'role': 'Senior Engineer'
+    },
+    {
+        'id': 'int_002',
+        'name': 'Simon',
+        'email': 'candidateagent9@gmail.com',
+        'slack_id': 'U5678EFGH',
+        'slack_email': 'agent@company.com',
+        'zoom_link': 'https://zoom.us/j/agent-personal-room',
+        'role': 'Tech Lead'
+    },
+    {
+        'id': 'int_003',
+        'name': 'Jule',
+        'email': 'name@gmail.com',
+        'slack_id': 'I5678EFGH',
+        'slack_email': 'name@company.com',
+        'zoom_link': 'https://zoom.us/j/name-personal-room',
+        'role': 'Design Lead'
+    }
+]
     
-    send_email("You got the job", "jjforce17@gmail.com", "Fabian")
+    cal_manager = calendar_module.CalendarManager()
+    ints = cal_manager.find_interview_slots_any_available(
+            interviewers=interviewers,
+            num_slots=3,
+            duration_minutes=60
+        )
+    
+    send_schedule_interview_email(
+        candidate_email=applicant_email,
+        candidate_name=applicant_name,
+
+        interviewer1_slack_id=ints[0]['slack_id'],
+        interviewer1_names=ints[0]['name'],
+        interviewer1_emails=ints[0]['email'],
+        interviewer1_start_times=ints[0]['start_time'],
+        interviewer1_end_times=ints[0]['end_time'],
+        interviewer1_zoom_links=ints[0]['zoom_link'],
+
+        interviewer2_slack_id=ints[1]['slack_id'],
+        interviewer2_names=ints[1]['name'],
+        interviewer2_emails=ints[1]['email'],
+        interviewer2_start_times=ints[1]['start_time'],
+        interviewer2_end_times=ints[1]['end_time'],
+        interviewer2_zoom_links=ints[1]['zoom_link'],
+
+        interviewer3_slack_id=ints[2]['slack_id'],
+        interviewer3_names=ints[2]['name'],
+        interviewer3_emails=ints[2]['email'],
+        interviewer3_start_times=ints[2]['start_time'],
+        interviewer3_end_times=ints[2]['end_time'],
+        interviewer3_zoom_links=ints[2]['zoom_link'],
+    )
 
 # Tool function registry
 TOOL_FUNCTIONS = {
@@ -66,6 +121,7 @@ def execute_function_call(func_call):
         print(f"Unknown function: {func_name}")
         return f"Error: Unknown function {func_name}"
 
+
 def process_gemini_response(response):
     """Process Gemini response, handling both text and function calls"""
     function_calls = []
@@ -79,6 +135,7 @@ def process_gemini_response(response):
     
     text = " ".join(text_parts) if text_parts else None
     return text, function_calls
+
 
 @app.message("")
 def handle_message(message, say):
@@ -185,72 +242,14 @@ def showResume(limit=3):
     random_rows = random.sample(rows, sample_size) if rows else []
     
     return random_rows
-
-
-def sendInterview(email, name):
-    interviewers = [
-    {
-        'id': 'int_001',
-        'name': 'Emily Qin',
-        'email': '123emilyqin@gmail.com',
-        'slack_id': 'U1234ABCD',
-        'slack_email': 'emily@company.com',
-        'zoom_link': 'https://zoom.us/j/emily-personal-room',
-        'role': 'Senior Engineer'
-    },
-    {
-        'id': 'int_002',
-        'name': 'Simon',
-        'email': 'candidateagent9@gmail.com',
-        'slack_id': 'U5678EFGH',
-        'slack_email': 'agent@company.com',
-        'zoom_link': 'https://zoom.us/j/agent-personal-room',
-        'role': 'Tech Lead'
-    },
-    {
-        'id': 'int_003',
-        'name': 'Jule',
-        'email': 'name@gmail.com',
-        'slack_id': 'I5678EFGH',
-        'slack_email': 'name@company.com',
-        'zoom_link': 'https://zoom.us/j/name-personal-room',
-        'role': 'Design Lead'
-    }
-]
     
-    cal_manager = calendar_module.CalendarManager()
-    ints = cal_manager.find_interview_slots_any_available(
-            interviewers=interviewers,
-            num_slots=3,
-            duration_minutes=60
-        )
-    
-    send_schedule_interview_email(
-        candidate_email=email,
-        candidate_name=name,
+def getResume():
+    #Magic ats
+    response = supabase.table("applicants").select("*").execute()
+    rows = response.data
 
-        interviewer1_slack_id=ints[0]['slack_id'],
-        interviewer1_names=ints[0]['name'],
-        interviewer1_emails=ints[0]['email'],
-        interviewer1_start_times=ints[0]['start_time'],
-        interviewer1_end_times=ints[0]['end_time'],
-        interviewer1_zoom_links=ints[0]['zoom_link'],
-
-        interviewer2_slack_id=ints[1]['slack_id'],
-        interviewer2_names=ints[1]['name'],
-        interviewer2_emails=ints[1]['email'],
-        interviewer2_start_times=ints[1]['start_time'],
-        interviewer2_end_times=ints[1]['end_time'],
-        interviewer2_zoom_links=ints[1]['zoom_link'],
-
-        interviewer3_slack_id=ints[2]['slack_id'],
-        interviewer3_names=ints[2]['name'],
-        interviewer3_emails=ints[2]['email'],
-        interviewer3_start_times=ints[2]['start_time'],
-        interviewer3_end_times=ints[2]['end_time'],
-        interviewer3_zoom_links=ints[2]['zoom_link'],
-    )
-    
+    random_rows = random.sample(rows, 2)
+    return random_rows
 
 @app.command("/getresumes")
 def showResume(ack, say, command):
@@ -284,3 +283,21 @@ def showResume(ack, say, command):
 
 if __name__ == "__main__":
     SocketModeHandler(app, os.getenv("SLACK_APP_TOKEN")).start()
+
+
+
+send_schedule_interview_email_declaration = {
+    "name": "sendInterview",
+    "description": "When the users ask to send interview, call this function",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "applicant_email": {"type": "string", "format": "email"},
+            "applicant_name": {"type": "string"},
+        },
+        "required": [
+            "applicant_email",
+            "applicant_name",
+        ],
+    },
+}

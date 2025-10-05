@@ -1,4 +1,3 @@
-# app.py - MVP Interview Booking Service (OAuth)
 from flask import Flask, request, jsonify
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -11,6 +10,8 @@ app = Flask(__name__)
 # Configuration
 CALENDAR_ID = 'candidateagent9@gmail.com'
 SCOPES = ['https://www.googleapis.com/auth/calendar']  # Full read/write access
+
+
 # TOKEN_FILE = './slack-server/gcal-integration/token.pickle'
 # CREDENTIALS_FILE = './slack-server/credentials.json'
 
@@ -35,9 +36,15 @@ def main():
             token.write(creds.to_json())
 
 
-
-# @app.get('/book-interview')
-def book_interview(interviewer_email, applicant_email, start_time, end_time, zoom_link, interviewer_name):  
+@app.get('/book-interview')
+def book_interview():
+    # Get query parameters
+    interviewer_email = request.args.get('interviewer_email')
+    applicant_email = request.args.get('applicant_email')
+    start_time = request.args.get('start_time')
+    end_time = request.args.get('end_time')
+    zoom_link = request.args.get('zoom_link')
+    interviewer_name = request.args.get('interviewer_name')
     # Validate required parameters
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
@@ -57,16 +64,18 @@ def book_interview(interviewer_email, applicant_email, start_time, end_time, zoo
             # Save the credentials for the next run
         with open("token.json", "w") as token:
             token.write(creds.to_json())
+
+        service = build("calendar", "v3", credentials=creds)
     if not all([interviewer_email, applicant_email, start_time, end_time, zoom_link]):
         return jsonify({"ok": False, "error": "Missing required parameters"}), 400
-    
+
     try:
         # Ensure timezone format
         if not start_time.endswith('Z'):
             start_time += 'Z'
         if not end_time.endswith('Z'):
             end_time += 'Z'
-        
+
         # Build calendar event
         event = {
             'summary': f'Interview: {interviewer_name} + Candidate',
@@ -79,25 +88,24 @@ def book_interview(interviewer_email, applicant_email, start_time, end_time, zoo
                 {'email': applicant_email}
             ]
         }
-        
+
         # Create event
-        service = get_calendar_service()
         created_event = service.events().insert(
             calendarId='primary',  # Use 'primary' when using OAuth
             body=event,
             sendUpdates='all'
         ).execute()
-        
+
         return jsonify({
             "ok": True,
             "message": "Interview booked successfully",
             "event_link": created_event.get('htmlLink')
         }), 200
-        
+
     except Exception as e:
         return jsonify({"ok": False, "error": str(e)}), 500
 
 
 if __name__ == '__main__':
-    # app.run(host='0.0.0.0', port=5001, debug=True)
+    app.run(host='0.0.0.0', port=5001, debug=True)
     main()

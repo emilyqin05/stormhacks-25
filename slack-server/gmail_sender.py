@@ -1,40 +1,42 @@
 import base64
-from email.mime.text import MIMEText
 import os.path
+from email.mime.text import MIMEText
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+
 from interviewscheduling import html_template
 
 SCOPES = ["https://www.googleapis.com/auth/gmail.send"]
 
+
 def send_schedule_interview_email(
-    candidate_email: str,
-    candidate_name: str,
+        candidate_email: str,
+        candidate_name: str,
 
-    interviewer1_slack_id: str,
-    interviewer1_names: str,
-    interviewer1_emails: str,
-    interviewer1_start_times: str,
-    interviewer1_end_times: str,
-    interviewer1_zoom_link: str,
+        interviewer1_slack_id: str,
+        interviewer1_names: str,
+        interviewer1_emails: str,
+        interviewer1_start_times: str,
+        interviewer1_end_times: str,
+        interviewer1_zoom_link: str,
 
-    interviewer2_slack_id: str,
-    interviewer2_names: str,
-    interviewer2_emails: str,
-    interviewer2_start_times: str,
-    interviewer2_end_times: str,
-    interviewer2_zoom_link: str,
+        interviewer2_slack_id: str,
+        interviewer2_names: str,
+        interviewer2_emails: str,
+        interviewer2_start_times: str,
+        interviewer2_end_times: str,
+        interviewer2_zoom_link: str,
 
-    interviewer3_slack_id: str,
-    interviewer3_names: str,
-    interviewer3_emails: str,
-    interviewer3_start_times: str,
-    interviewer3_end_times: str,
-    interviewer3_zoom_link: str,
+        interviewer3_slack_id: str,
+        interviewer3_names: str,
+        interviewer3_emails: str,
+        interviewer3_start_times: str,
+        interviewer3_end_times: str,
+        interviewer3_zoom_link: str,
 ):
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
@@ -88,6 +90,7 @@ def send_schedule_interview_email(
             interviewer3_end_times,
             interviewer3_zoom_link,
         )
+        print(link1, link2, link3)
 
         # Inject generated links into the interview scheduling HTML template
         html = (
@@ -122,14 +125,14 @@ def send_schedule_interview_email(
 
 
 def getButtonLink(
-    candidate_email: str,
-    candidate_name: str,
-    interviewer_slack_id: str,
-    interviewer_names: str,
-    interviewer_emails: str,
-    interviewer_start_times: str,
-    interviewer_end_times: str,
-    interviewer_zoom_link: str,
+        candidate_email: str,
+        candidate_name: str,
+        interviewer_slack_id: str,
+        interviewer_names: str,
+        interviewer_emails: str,
+        interviewer_start_times: str,
+        interviewer_end_times: str,
+        interviewer_zoom_link: str,
 ):
     base_url = "http://127.0.0.1:5001/book-interview"
     return (
@@ -146,71 +149,54 @@ def getButtonLink(
 
 
 def main():
-    # Example invocation for manual testing
-    send_email(
-        "Hello, this is a test email.",
-        "test@test.com",
-        "Test User",
+    # Mock data for testing send_schedule_interview_email
+    candidate_email = "test.candidate@example.com"
+    candidate_name = "TestCandidate"
+
+    interviewer1_slack_id = "U123456"
+    interviewer1_names = "InterviewerOne"
+    interviewer1_emails = "interviewer1@example.com"
+    interviewer1_start_times = "2025-10-10T09:00:00"
+    interviewer1_end_times = "2025-10-10T10:00:00"
+    interviewer1_zoom_link = "https://zoom.us/j/1234567890"
+
+    interviewer2_slack_id = "U234567"
+    interviewer2_names = "InterviewerTwo"
+    interviewer2_emails = "interviewer2@example.com"
+    interviewer2_start_times = "2025-10-10T11:00:00"
+    interviewer2_end_times = "2025-10-10T12:00:00"
+    interviewer2_zoom_link = "https://zoom.us/j/2345678901"
+
+    interviewer3_slack_id = "U345678"
+    interviewer3_names = "InterviewerThree"
+    interviewer3_emails = "interviewer3@example.com"
+    interviewer3_start_times = "2025-10-10T13:00:00"
+    interviewer3_end_times = "2025-10-10T14:00:00"
+    interviewer3_zoom_link = "https://zoom.us/j/3456789012"
+
+    send_schedule_interview_email(
+        candidate_email,
+        candidate_name,
+        interviewer1_slack_id,
+        interviewer1_names,
+        interviewer1_emails,
+        interviewer1_start_times,
+        interviewer1_end_times,
+        interviewer1_zoom_link,
+        interviewer2_slack_id,
+        interviewer2_names,
+        interviewer2_emails,
+        interviewer2_start_times,
+        interviewer2_end_times,
+        interviewer2_zoom_link,
+        interviewer3_slack_id,
+        interviewer3_names,
+        interviewer3_emails,
+        interviewer3_start_times,
+        interviewer3_end_times,
+        interviewer3_zoom_link,
     )
+
 
 if __name__ == "__main__":
     main()
-
-
-send_schedule_interview_email_declaration = {
-    "name": "send_schedule_interview_email",
-    "description": "Send interview scheduling email with three interviewer detail groups.",
-    "parameters": {
-        "type": "object",
-        "properties": {
-            "candidate_email": {"type": "string", "format": "email"},
-            "candidate_name": {"type": "string"},
-
-            "interviewer1_slack_id": {"type": "string"},
-            "interviewer1_names": {"type": "string"},
-            "interviewer1_emails": {"type": "string", "format": "email"},
-            "interviewer1_start_times": {"type": "string"},
-            "interviewer1_end_times": {"type": "string"},
-            "interviewer1_zoom_link": {"type": "string"},
-
-            "interviewer2_slack_id": {"type": "string"},
-            "interviewer2_names": {"type": "string"},
-            "interviewer2_emails": {"type": "string", "format": "email"},
-            "interviewer2_start_times": {"type": "string"},
-            "interviewer2_end_times": {"type": "string"},
-            "interviewer2_zoom_link": {"type": "string"},
-
-            "interviewer3_slack_id": {"type": "string"},
-            "interviewer3_names": {"type": "string"},
-            "interviewer3_emails": {"type": "string", "format": "email"},
-            "interviewer3_start_times": {"type": "string"},
-            "interviewer3_end_times": {"type": "string"},
-            "interviewer3_zoom_link": {"type": "string"},
-        },
-        "required": [
-            "candidate_email",
-            "candidate_name",
-
-            "interviewer1_slack_id",
-            "interviewer1_names",
-            "interviewer1_emails",
-            "interviewer1_start_times",
-            "interviewer1_end_times",
-            "interviewer1_zoom_link",
-
-            "interviewer2_slack_id",
-            "interviewer2_names",
-            "interviewer2_emails",
-            "interviewer2_start_times",
-            "interviewer2_end_times",
-            "interviewer2_zoom_link",
-
-            "interviewer3_slack_id",
-            "interviewer3_names",
-            "interviewer3_emails",
-            "interviewer3_start_times",
-            "interviewer3_end_times",
-            "interviewer3_zoom_link",
-        ],
-    },
-}
