@@ -7,3 +7,5 @@ gcal-integration/token.pickle
 
 # Python
 __pycache__/
+
+token.pickle
