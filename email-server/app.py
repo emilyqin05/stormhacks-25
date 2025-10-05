@@ -11,7 +11,12 @@ from flask import jsonify, request
 from time import sleep
 import google.generativeai as genai
 
-genai.configure(api_key="")
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 model = genai.GenerativeModel("gemini-2.5-pro")
 
 # Scope for read/write access
@@ -38,8 +43,11 @@ def func():
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
+            print("before flow")
             flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
+            print("after flow" )
             creds = flow.run_local_server(port=0)
+            print("after after flow")
         with open("token.json", "w") as token:
             token.write(creds.to_json())
 
