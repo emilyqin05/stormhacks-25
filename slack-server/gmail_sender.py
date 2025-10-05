@@ -11,17 +11,7 @@ from googleapiclient.errors import HttpError
 SCOPES = ["https://www.googleapis.com/auth/gmail.send"]
 
 
-def send_schedule_interview_email(message_content, applicant_email, applicant_name):
-    """
-    Sends an email reply using the Gmail API.
-
-    Args:
-      sender: Email address of the receiver.
-      reply_subject: The subject of the email.
-      reply_body: The body text of the email.
-      thread_id: The thread ID to reply to (optional).
-      message_id_header: The message ID to reply to for In-Reply-To header (optional).
-    """
+def send_schedule_interview_email(message_content: str, applicant_email: str, applicant_name: str):
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -46,6 +36,9 @@ def send_schedule_interview_email(message_content, applicant_email, applicant_na
         service = build("gmail", "v1", credentials=creds)
         message = EmailMessage()
 
+        # TODO: make template for message content
+
+        # TODO: have scheduling link in message content
         message.set_content(message_content)
         message["To"] = applicant_email
         message["From"] = "candidateagent9@gmail.com"
@@ -56,6 +49,7 @@ def send_schedule_interview_email(message_content, applicant_email, applicant_na
         encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
 
         create_message = {"raw": encoded_message}
+
 
         send_message = (
             service.users()
@@ -70,15 +64,26 @@ def send_schedule_interview_email(message_content, applicant_email, applicant_na
     return send_message
 
 
-send_email_declaration = {
+send_schedule_interview_email_declaration = {
     "name": "send_schedule_interview_email",
-    "description": "Sends email to interview candidate. Use this when you want to send an email to an interview candidate.",
+    "description": "Sends email to schedule an interview. Use this when you want to schedule an interview with shortlisted candidiates.",
     "parameters": {
         "type": "object",
-        "properties": {},
-        "required": [],
+        "properties": {
+            "message_content": {
+                "type": "string",
+                "description": "Plain text body of the email to send to the candidate.",
+            },
+            "applicant_email": {
+                "type": "string",
+                "format": "email",
+                "description": "Candidate's email address.",
+            },
+            "applicant_name": {
+                "type": "string",
+                "description": "Candidate's full name used in the email subject/body.",
+            },
+        },
+        "required": ["message_content", "applicant_email", "applicant_name"],
     },
 }
-
-if __name__ == "__main__":
-    send_schedule_interview_email("Hello, this is a test email.", "test@test.com", "Test User")
