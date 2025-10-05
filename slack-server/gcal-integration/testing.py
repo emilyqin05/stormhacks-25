@@ -16,7 +16,7 @@ interviewers = [
     },
     {
         'id': 'int_002',
-        'name': 'Agent',
+        'name': 'Simon',
         'email': 'candidateagent9@gmail.com',
         'slack_id': 'U5678EFGH',
         'slack_email': 'agent@company.com',
@@ -25,7 +25,7 @@ interviewers = [
     },
     {
         'id': 'int_003',
-        'name': 'Name',
+        'name': 'Jule',
         'email': 'name@gmail.com',
         'slack_id': 'I5678EFGH',
         'slack_email': 'name@company.com',

@@ -11,6 +11,7 @@ from slack_sdk import WebClient
 import requests
 from io import BytesIO
 from google.genai import types
+import calendar_module
 
 
 load_dotenv()
@@ -105,8 +106,43 @@ def getResume():
 
 
 def sendInterview(email, name):
-    ints = [{'id': 'int_001', 'name': 'Emily Qin', 'email': '123emilyqin@gmail.com', 'slack_id': 'U1234ABCD', 'slack_email': 'alice@company.com', 'zoom_link': 'https://zoom.us/j/alice-personal-room', 'role': 'Senior Engineer', 'start_time': '2025-10-06T09:00:00', 'end_time': '2025-10-06T10:00:00'},{'id': 'int_002','name': 'Agent','email': 'candidateagent9@gmail.com','slack_id': 'U5678EFGH','slack_email': 'bob@company.com','zoom_link': 'https://zoom.us/j/bob-personal-room','role': 'Tech Lead','start_time': '2025-10-06T09:00:00','end_time': '2025-10-06T10:00:00'}
-    ,{'id': 'int_003','name': 'Agent','email': 'notrealcandidate@gmail.com','slack_id': 'U5678EFGH','slack_email': 'weafbob@company.com','zoom_link': 'https://zoom.us/j/bob-personal-room','role': 'Tech Lead','start_time': '2025-10-08T09:00:00','end_time': '2025-10-08T10:00:00'}]
+    interviewers = [
+    {
+        'id': 'int_001',
+        'name': 'Emily Qin',
+        'email': '123emilyqin@gmail.com',
+        'slack_id': 'U1234ABCD',
+        'slack_email': 'emily@company.com',
+        'zoom_link': 'https://zoom.us/j/emily-personal-room',
+        'role': 'Senior Engineer'
+    },
+    {
+        'id': 'int_002',
+        'name': 'Simon',
+        'email': 'candidateagent9@gmail.com',
+        'slack_id': 'U5678EFGH',
+        'slack_email': 'agent@company.com',
+        'zoom_link': 'https://zoom.us/j/agent-personal-room',
+        'role': 'Tech Lead'
+    },
+    {
+        'id': 'int_003',
+        'name': 'Jule',
+        'email': 'name@gmail.com',
+        'slack_id': 'I5678EFGH',
+        'slack_email': 'name@company.com',
+        'zoom_link': 'https://zoom.us/j/name-personal-room',
+        'role': 'Design Lead'
+    }
+]
+    
+    cal_manager = calendar_module.CalendarManager()
+    ints = cal_manager.find_interview_slots_any_available(
+            interviewers=interviewers,
+            num_slots=3,
+            duration_minutes=60
+        )
+    
     send_schedule_interview_email(
         candidate_email=email,
         candidate_name=name,
