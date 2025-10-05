@@ -8,3 +8,4 @@ slack-server/credentials.json
 slack-server/credentials.json
 /email-server/.idea
 .vercel
+slack-server/token.json
