@@ -8,57 +8,55 @@ import os
 import pickle
 
 app = Flask(__name__)
-
 # Configuration
 CALENDAR_ID = 'candidateagent9@gmail.com'
 SCOPES = ['https://www.googleapis.com/auth/calendar']  # Full read/write access
-TOKEN_FILE = './slack-server/gcal-integration/token.pickle'
-CREDENTIALS_FILE = './slack-server/credentials.json'
+# TOKEN_FILE = './slack-server/gcal-integration/token.pickle'
+# CREDENTIALS_FILE = './slack-server/credentials.json'
 
-
-def get_calendar_service():
+def main():
     creds = None
-    
-    # Load saved credentials
-    if os.path.exists(TOKEN_FILE):
-        with open(TOKEN_FILE, 'rb') as token:
-            creds = pickle.load(token)
-    
-    # If no valid credentials OR scope changed, re-authenticate
+    # The file token.json stores the user's access and refresh tokens, and is
+    # created automatically when the authorization flow completes for the first
+    # time.
+    if os.path.exists("token.json"):
+        creds = Credentials.from_authorized_user_file("token.json", SCOPES)
+    # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
-            try:
-                creds.refresh(Request())
-            except Exception as e:
-                print(f"⚠️  Token refresh failed: {e}")
-                print("🔄 Deleting old token and re-authenticating...")
-                os.remove(TOKEN_FILE)
-                creds = None
-        
-        if not creds:
+            creds.refresh(Request())
+        else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                CREDENTIALS_FILE, SCOPES)
+                "credentials.json", SCOPES
+            )
             creds = flow.run_local_server(port=0)
-            print("✅ New credentials obtained!")
-        
-        # Save credentials for next run
-        with open(TOKEN_FILE, 'wb') as token:
-            pickle.dump(creds, token)
-    
-    return build('calendar', 'v3', credentials=creds)
+            # Save the credentials for the next run
+        with open("token.json", "w") as token:
+            token.write(creds.to_json())
 
 
-@app.get('/book-interview')
-def book_interview():
-    # Get query parameters
-    interviewer_email = request.args.get('interviewer_email')
-    applicant_email = request.args.get('applicant_email')
-    start_time = request.args.get('start_time')
-    end_time = request.args.get('end_time')
-    zoom_link = request.args.get('zoom_link')
-    interviewer_name = request.args.get('interviewer_name', 'Team Member')
-    
+
+# @app.get('/book-interview')
+def book_interview(interviewer_email, applicant_email, start_time, end_time, zoom_link, interviewer_name):  
     # Validate required parameters
+    creds = None
+    # The file token.json stores the user's access and refresh tokens, and is
+    # created automatically when the authorization flow completes for the first
+    # time.
+    if os.path.exists("token.json"):
+        creds = Credentials.from_authorized_user_file("token.json", SCOPES)
+    # If there are no (valid) credentials available, let the user log in.
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                "credentials.json", SCOPES
+            )
+            creds = flow.run_local_server(port=0)
+            # Save the credentials for the next run
+        with open("token.json", "w") as token:
+            token.write(creds.to_json())
     if not all([interviewer_email, applicant_email, start_time, end_time, zoom_link]):
         return jsonify({"ok": False, "error": "Missing required parameters"}), 400
     
@@ -101,4 +99,5 @@ def book_interview():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001, debug=True)
+    # app.run(host='0.0.0.0', port=5001, debug=True)
+    main()
