@@ -28,10 +28,19 @@ chat_history = [
 ]
 
 print("got chat")
+def sendInterview(message_content: str, applicant_email: str, applicant_name: str):
+    print("HOLA")
+    ints = [
+        {'id': 'int_001', 'name': 'Emily Qin', 'email': '123emilyqin@gmail.com', 'slack_id': 'U1234ABCD', 'slack_email': 'alice@company.com', 'zoom_link': 'https://zoom.us/j/alice-personal-room', 'role': 'Senior Engineer', 'start_time': '2025-10-06T09:00:00', 'end_time': '2025-10-06T10:00:00'},
+        {'id': 'int_002','name': 'Agent','email': 'candidateagent9@gmail.com','slack_id': 'U5678EFGH','slack_email': 'bob@company.com','zoom_link': 'https://zoom.us/j/bob-personal-room','role': 'Tech Lead','start_time': '2025-10-06T09:00:00','end_time': '2025-10-06T10:00:00'},
+        {'id': 'int_003','name': 'Agent','email': 'notrealcandidate@gmail.com','slack_id': 'U5678EFGH','slack_email': 'weafbob@company.com','zoom_link': 'https://zoom.us/j/bob-personal-room','role': 'Tech Lead','start_time': '2025-10-08T09:00:00','end_time': '2025-10-08T10:00:00'}
+    ]
+    
+    send_email("You got the job", "jjforce17@gmail.com", "Fabian")
 
 # Tool function registry
 TOOL_FUNCTIONS = {
-    "send_email": send_email,
+    "send_email": sendInterview,
     "showResume": lambda **kwargs: showResume(**kwargs)
 }
 
@@ -202,14 +211,6 @@ def upload_resumes_to_slack(channel_id, resumes):
     
     return results
 
-def sendInterview(email, name):
-    ints = [
-        {'id': 'int_001', 'name': 'Emily Qin', 'email': '123emilyqin@gmail.com', 'slack_id': 'U1234ABCD', 'slack_email': 'alice@company.com', 'zoom_link': 'https://zoom.us/j/alice-personal-room', 'role': 'Senior Engineer', 'start_time': '2025-10-06T09:00:00', 'end_time': '2025-10-06T10:00:00'},
-        {'id': 'int_002','name': 'Agent','email': 'candidateagent9@gmail.com','slack_id': 'U5678EFGH','slack_email': 'bob@company.com','zoom_link': 'https://zoom.us/j/bob-personal-room','role': 'Tech Lead','start_time': '2025-10-06T09:00:00','end_time': '2025-10-06T10:00:00'},
-        {'id': 'int_003','name': 'Agent','email': 'notrealcandidate@gmail.com','slack_id': 'U5678EFGH','slack_email': 'weafbob@company.com','zoom_link': 'https://zoom.us/j/bob-personal-room','role': 'Tech Lead','start_time': '2025-10-08T09:00:00','end_time': '2025-10-08T10:00:00'}
-    ]
-    
-    send_email("You got the job", "jjforce17@gmail.com", "Fabian")
 
 @app.command("/getresumes")
 def handle_getresumes_command(ack, say, command):
