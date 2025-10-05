@@ -1,4 +1,5 @@
 import base64
+from email.message import EmailMessage
 import os.path
 
 from email.mime.text import MIMEText
@@ -11,17 +12,7 @@ from googleapiclient.errors import HttpError
 SCOPES = ["https://www.googleapis.com/auth/gmail.send"]
 
 
-def send_schedule_interview_email(sender, reply_subject, reply_body, thread_id, message_id_header):
-    """
-    Sends an email reply using the Gmail API.
-
-    Args:
-      sender: Email address of the receiver.
-      reply_subject: The subject of the email.
-      reply_body: The body text of the email.
-      thread_id: The thread ID to reply to (optional).
-      message_id_header: The message ID to reply to for In-Reply-To header (optional).
-    """
+def send_schedule_interview_email(message_content: str, applicant_email: str, applicant_name: str):
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -98,10 +89,21 @@ send_email_declaration = {
     "description": "Sends email to interview candidate. Use this when you want to send an email to an interview candidate.",
     "parameters": {
         "type": "object",
-        "properties": {},
-        "required": [],
+        "properties": {
+            "message_content": {
+                "type": "string",
+                "description": "Plain text body of the email to send to the candidate.",
+            },
+            "applicant_email": {
+                "type": "string",
+                "format": "email",
+                "description": "Candidate's email address.",
+            },
+            "applicant_name": {
+                "type": "string",
+                "description": "Candidate's full name used in the email subject/body.",
+            },
+        },
+        "required": ["message_content", "applicant_email", "applicant_name"],
     },
 }
-
-if __name__ == "__main__":
-    send_schedule_interview_email("", "Interview Schedule", "Hello, this is a test email.", "1234567890", "1234567890")

@@ -11,3 +11,4 @@ slack-server/credentials.json
 .DS_Store
 
 token.pickle
+slack-server/token.json
