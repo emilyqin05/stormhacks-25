@@ -9,3 +9,6 @@ slack-server/credentials.json
 /email-server/.idea
 .vercel
 slack-server/token.json
+.DS_Store
+
+token.pickle
