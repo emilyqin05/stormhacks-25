@@ -43,13 +43,34 @@ def handle_message(message, say):
     )
 
 
-    tools = types.Tool(function_declarations=[send_schedule_interview_email_declaration])
-    config = types.GenerateContentConfig(tools=[tools])
+    interviewTool = types.Tool(function_declarations=[send_schedule_interview_schedule_interview_email_declaration])
+    resumeTool = types.Tool(function_declarations=[get_resume_declaration])
+
+    config = types.GenerateContentConfig(tools=[interviewTool, resumeTool])
 
     response = client.models.generate_content(
         model="gemini-2.5-flash",
-        contents=[conversation_prompt]
+        contents=[conversation_prompt],
+        config=config,
+
     )
+
+    # Check if the we trigger a tool call or not
+    if response.candidates[0].content.parts[0].function_call:
+        print("Gemini wants to call a function")
+        #chat_history.append(response.candidates[0].content.parts[0]) #we add the intent to call tool to the chat history
+        func_call = response.candidates[0].content.parts[0].function_call
+        print("Function call detected:", func_call.name)
+        print("Args:", func_call.args)
+        if func_call.name == "send_schedule_interview_email":
+            result = send_schedule_interview_email(**func_call.args)
+            print("Result is", result)
+            chat_history.append({"role": "function", "content": f"{func_call.name} returned: {result}"})
+            conversation_prompt = "\n".join(
+                f"{msg['role'].capitalize()}: {msg['content']}" for msg in chat_history
+            )
+            response = client.models.generate_content(model="gemini-2.5-flash",contents=[conversation_prompt],config=config,)
+            
     chat_history.append({"role": "assistant", "content": response.text})
     supabase.table("messages").insert([
         {"role": "user", "content": user_text},
@@ -58,6 +79,23 @@ def handle_message(message, say):
     say(response.text)
 
 
+
+from google.genai import types
+
+get_resume_declaration = types.FunctionDeclaration(
+    name="showResume",
+    description="Fetches a list of candidate resumes from the directory table. Returns the top N resumes randomly selected.",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "limit": types.Schema(
+                type=types.Type.INTEGER,
+                description="The number of resumes to fetch (default 3)"
+            )
+        },
+        required=[]
+    )
+)
 def getResume():
     #Magic ats
     response = supabase.table("applicants").select("*").execute()
