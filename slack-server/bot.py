@@ -17,7 +17,7 @@ key = os.getenv("SUPABASE_KEY")
 supabase = create_client(url, key)
 
 chat_history = [
-    {"role": msg["role"], "content": msg["content"]} 
+    {"role": msg["role"], "content": msg["content"]}
     for msg in supabase.table("messages").select("*").order("created_at").execute().data
 ]
 
@@ -50,3 +50,8 @@ def handle_message(message, say):
 
 if __name__ == "__main__":
     SocketModeHandler(app, os.getenv("SLACK_APP_TOKEN")).start()
+
+def getResume():
+    #Magic ats
+    response = supabase.rpc("random_rows", {"table_name": "directory", "limit_count": 3})
+    print(response)
