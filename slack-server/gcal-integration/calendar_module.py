@@ -16,7 +16,7 @@ class CalendarManager:
     Designed to be called by Slack bot with interviewer data.
     """
     
-    def __init__(self, credentials_path: str = '../../email-server/credentials.json', token_path: str = 'token.pickle'):
+    def __init__(self, credentials_path: str = './email-server/credentials.json', token_path: str = 'token.pickle'):
         self.credentials_path = credentials_path
         self.token_path = token_path
         self.service = None

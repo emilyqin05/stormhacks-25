@@ -1,4 +1,4 @@
-import calendar_module1 as calendar_module
+import calendar_module
 import json
 # Initialize the calendar manager
 cal_manager = calendar_module.CalendarManager()
