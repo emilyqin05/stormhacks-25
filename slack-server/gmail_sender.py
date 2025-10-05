@@ -12,7 +12,8 @@ from googleapiclient.errors import HttpError
 SCOPES = ["https://www.googleapis.com/auth/gmail.send"]
 
 
-def send_schedule_interview_email(message_content: str, applicant_email: str, applicant_name: str):
+def send_email(message_content: str, applicant_email: str, applicant_name: str):
+    print("EMAIL SENT")
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -63,6 +64,7 @@ def send_schedule_interview_email(message_content: str, applicant_email: str, ap
             .execute()
         )
 
+
     except HttpError as error:
         print(f"An error occurred: {error}")
         send_message = None
@@ -70,7 +72,7 @@ def send_schedule_interview_email(message_content: str, applicant_email: str, ap
 
 def main():
     # Example invocation for manual testing
-    send_schedule_interview_email(
+    send_email(
         "Hello, this is a test email.",
         "test@test.com",
         "Test User",
@@ -80,9 +82,9 @@ if __name__ == "__main__":
     main()
 
 
-send_schedule_interview_email_declaration = {
-    "name": "send_schedule_interview_email",
-    "description": "Sends email to schedule an interview. Use this when you want to schedule an interview with shortlisted candidiates.",
+send_candidate_email_declaration = {
+    "name": "send_candidate_email_declaration",
+    "description": "Sends email to specific candidates, this can be scheduling an interview or other information.",
     "parameters": {
         "type": "object",
         "properties": {
