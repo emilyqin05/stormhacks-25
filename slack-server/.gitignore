@@ -1,3 +1,4 @@
 .history
 .env
 venv/
+gcal-integration/token.pickle
