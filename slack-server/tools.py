@@ -1,3 +1,0 @@
-gmail_function = {
-    "name"
-}

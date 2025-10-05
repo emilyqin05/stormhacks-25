@@ -5,7 +5,7 @@ from google import genai
 from google.genai import types
 from dotenv import load_dotenv
 
-from tools import gmail_function
+from gmail_sender import send_email_declaration
 
 load_dotenv()
 
@@ -24,7 +24,7 @@ def handle_message(message, say):
         {"role": "user", "content": user_text}
     ]
 
-    tools = types.Tool(function_declarations=[gmail_function])
+    tools = types.Tool(function_declarations=[send_email_declaration])
     config = types.GenerateContentConfig(tools=[tools])
 
     response = client.models.generate_content(
