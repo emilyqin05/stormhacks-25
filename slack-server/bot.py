@@ -2,7 +2,6 @@ import os
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 from google import genai
-import logging
 from dotenv import load_dotenv
 
 load_dotenv() 
