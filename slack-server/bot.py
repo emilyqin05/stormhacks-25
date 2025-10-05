@@ -2,10 +2,10 @@ import os
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 from google import genai
-import logging
+from google.genai import types
 from dotenv import load_dotenv
 from supabase import create_client
-
+from gmail_sender import send_email_declaration
 
 load_dotenv()
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
@@ -36,6 +36,9 @@ def handle_message(message, say):
     f"{msg['role'].capitalize()}: {msg['content']}" for msg in chat_history
     )
 
+
+    tools = types.Tool(function_declarations=[send_email_declaration])
+    config = types.GenerateContentConfig(tools=[tools])
 
     response = client.models.generate_content(
         model="gemini-2.5-flash",

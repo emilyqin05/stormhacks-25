@@ -1,5 +1,7 @@
 # Ignore virtual environment folder
 venv/
+credentials.json
+token.json
 
 # Ignore Python bytecode files
 __pycache__/

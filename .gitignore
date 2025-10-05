@@ -1,0 +1,11 @@
+.history
+/slack-server/.idea
+/.idea
+.env
+slack-server/tokens.json
+email-server/tokens.json
+slack-server/credentials.json
+slack-server/credentials.json
+/email-server/.idea
+.vercel
+slack-server/token.json
