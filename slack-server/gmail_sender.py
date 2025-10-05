@@ -1,5 +1,6 @@
 import base64
 from email.message import EmailMessage
+from email.mime.text import MIMEText
 import os.path
 
 from google.auth.transport.requests import Request
@@ -32,14 +33,18 @@ def send_schedule_interview_email(message_content: str, applicant_email: str, ap
             token.write(creds.to_json())
 
     try:
-        # Call the Gmail API to send the email
         service = build("gmail", "v1", credentials=creds)
-        message = EmailMessage()
+
+        template_path = os.path.join(os.path.dirname(__file__), "interview-scheduling.html")
+        with open(template_path, "r", encoding="utf-8") as template_file:
+            html_content = template_file.read()
+        message = MIMEText(html_content, 'html')
+        # message.set_content(message_content)
+        # message = EmailMessage()
 
         # TODO: make template for message content
 
         # TODO: have scheduling link in message content
-        message.set_content(message_content)
         message["To"] = applicant_email
         message["From"] = "candidateagent9@gmail.com"
 
@@ -62,6 +67,17 @@ def send_schedule_interview_email(message_content: str, applicant_email: str, ap
         print(f"An error occurred: {error}")
         send_message = None
     return send_message
+
+def main():
+    # Example invocation for manual testing
+    send_schedule_interview_email(
+        "Hello, this is a test email.",
+        "test@test.com",
+        "Test User",
+    )
+
+if __name__ == "__main__":
+    main()
 
 
 send_schedule_interview_email_declaration = {

@@ -9,3 +9,4 @@ slack-server/credentials.json
 /email-server/.idea
 .vercel
 slack-server/token.json
+/slack-server/__pycache__
