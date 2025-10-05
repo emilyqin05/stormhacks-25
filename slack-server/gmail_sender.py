@@ -83,7 +83,7 @@ if __name__ == "__main__":
 
 
 send_candidate_email_declaration = {
-    "name": "send_candidate_email_declaration",
+    "name": "send_email",
     "description": "Sends email to specific candidates, this can be scheduling an interview or other information.",
     "parameters": {
         "type": "object",
