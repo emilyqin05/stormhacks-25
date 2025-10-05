@@ -17,4 +17,7 @@ token.pickle
 slack-server/service-account-key.json
 slack-server/token.json
 slack-server/token.json
+.DS_Store
+
+token.pickle
 slack-server/token.json

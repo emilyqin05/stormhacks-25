@@ -3,3 +3,8 @@
 venv/
 gcal-integration/token.pickle
 token.json
+
+.DS_Store
+
+# Python
+__pycache__/
